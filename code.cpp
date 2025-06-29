@@ -59,7 +59,10 @@ bool solve_sudoku(int grid[N][N]) {
     return true;
 }
 
-void generate_sudoku(int solution[N][N], int puzzle[N][N], int holes) {
+void generate_sudoku(int solution[N][N], int puzzle[N][N]) {
+    cout<<"35 holes for easy, 45 holes for medium, 55 holes for hard"<<endl;
+    cout<<"Enter Number of Holes ->"<<endl;
+    int holes;cin>>holes;
     for(int i = 0; i < N; i++) {
         for(int j = 0; j < N; j++) {
             solution[i][j] = 0;
@@ -83,23 +86,15 @@ void generate_sudoku(int solution[N][N], int puzzle[N][N], int holes) {
             puzzle[i][j] = solution[i][j];
         }
     }
-    vector<pair<int,int>> coords;
-coords.reserve(N*N);
-
-// 1. collect every (row,col)
-for(int r = 0; r < N; r++)
-  for(int c = 0; c < N; c++)
-    coords.emplace_back(r,c);
-
-// 2. shuffle the list
-shuffle(coords.begin(), coords.end(), engine);
-
-// 3. dig holes in the first `holes` positions
-for(int k = 0; k < holes; k++){
-  auto [r, c] = coords[k];
-  puzzle[r][c] = 0;
-}
-
+    int removed = 0;
+    while(removed < holes) {
+        int row = uniform_int_distribution<int>{0, N-1}(engine);
+        int col = uniform_int_distribution<int>{0, N-1}(engine);
+        if(puzzle[row][col] != 0) {
+            puzzle[row][col] = 0;
+            removed++;
+        }
+    }
 }
 
 bool is_grid_complete(int grid[N][N]) {
@@ -194,7 +189,7 @@ int main() {
         cin >> choice;
         switch(choice) {
             case 1:
-                generate_sudoku(solution, puzzle, 45);
+                generate_sudoku(solution, puzzle);
                 puzzle_generated = true;
                 cout << "\nGenerated Sudoku puzzle:"<<endl;
                 print_grid(puzzle);
