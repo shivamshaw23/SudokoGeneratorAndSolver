@@ -83,15 +83,23 @@ void generate_sudoku(int solution[N][N], int puzzle[N][N], int holes) {
             puzzle[i][j] = solution[i][j];
         }
     }
-    int removed = 0;
-    while(removed < holes) {
-        int row = uniform_int_distribution<int>{0, N-1}(engine);
-        int col = uniform_int_distribution<int>{0, N-1}(engine);
-        if(puzzle[row][col] != 0) {
-            puzzle[row][col] = 0;
-            removed++;
-        }
-    }
+    vector<pair<int,int>> coords;
+coords.reserve(N*N);
+
+// 1. collect every (row,col)
+for(int r = 0; r < N; r++)
+  for(int c = 0; c < N; c++)
+    coords.emplace_back(r,c);
+
+// 2. shuffle the list
+shuffle(coords.begin(), coords.end(), engine);
+
+// 3. dig holes in the first `holes` positions
+for(int k = 0; k < holes; k++){
+  auto [r, c] = coords[k];
+  puzzle[r][c] = 0;
+}
+
 }
 
 bool is_grid_complete(int grid[N][N]) {
